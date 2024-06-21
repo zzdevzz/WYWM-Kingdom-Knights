@@ -3,9 +3,16 @@ import time
 from logic import *
 # Call to create a new knight
 
-items_attack = {"default": int(10), "bronze": int(20), "steel": int(30), "obsedian": int(50)}
-items_defence = {"default": int(10), "bronze": int(20), "steel": int(30), "obsedian": int(50)}
-items_horse = {"default": int(50), "medium": int(65), "large": int(80), "supreme": int(100)}
+# items_attack = [{"name": "default", "value": int(10), "price": int(10)},
+#                 {"name": "bronze", "value": int(20), "price": int(20)},
+#                 {"name": "steel", "value": int(30), "price": int(80)},
+#                 {"name": "obsedian", "value": int(50), "price": int(100)}]
+# items_defence = items_attack
+# items_horse = [{"name": "default", "value": int(50), "price": int(10)},
+#                 {"name": "medium", "value": int(20), "price": int(50)},
+#                 {"name": "large", "value": int(40), "price": int(100)},
+#                 {"name": "supreme", "value": int(60), "price": int(200)}]
+# items = [items_attack, items_defence, items_horse]
 
 def display_info(knight):
     print("Current stats for " + knight["name"] + ": " "\n")
@@ -21,9 +28,7 @@ def display_info(knight):
         print(str(x) + ": x " + str(y))
     print()
     
-def calculate_player_stats(knight):
-    pass
-    
+
 def create_knight(knights):  
     #Create a new dictionary to hold knights data
     knights_data = {}
@@ -35,9 +40,9 @@ def create_knight(knights):
     knights_data["stats"] = {"level": int(1), 
                              "xp": int(10), 
                              "max_health": int(100),
-                             "current_health": int(100), 
+                             "current_health": int(70), 
                              "attack": int(10), 
-                             "strength": int(10)}
+                             "defence": int(10)}
     knights_data["weaponry"] = {"horse": "default", "sword": "default", "shield": "default", "armour": "default"}
     knights_data["inventory"] = {"bandages" : int(5), "throwing_knife": int(5), "gold": int(100)}
     
@@ -157,5 +162,4 @@ print("Welcome to our Kingdom!")
 print("You need to create Knights to defend the Kingdom with.")
 # menu(knights_number)
 create_knight(knights)
-print(knights)
 print(combat.heal(knights[0]))
