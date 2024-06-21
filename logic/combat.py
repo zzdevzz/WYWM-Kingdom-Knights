@@ -29,3 +29,8 @@ def is_dead(knight):
 
 def generate_opponent(knight, items):
     oppenent = {}
+    
+def battle_stats(knight):
+    defence_total = knight["stats"]["defence"] + knight["weaponry"]["horse"]
+    attack_total = knight["stats"]["attack"] + knight["weaponry"]["horse"]
+    health_total = knight["stats"]["health"] + knight["weaponry"]["horse"]
