@@ -24,3 +24,5 @@ items_horse = [{"name": "default", "value": int(50), "price": int(10), "id": int
 
 items = [items_sword, items_shield, items_armour, items_horse]
 
+item2 = items_sword + items_shield
+print(item2)

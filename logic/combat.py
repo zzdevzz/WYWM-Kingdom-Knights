@@ -1,6 +1,11 @@
 # Make it so it's chance based like runescape.
 # Make it so there's timeouts between each hit.
 
+from data import items
+
+def get_item(id,items):
+    
+
 def battle(person1, person2):
     pass
 
@@ -31,6 +36,11 @@ def generate_opponent(knight, items):
     oppenent = {}
     
 def battle_stats(knight):
-    defence_total = knight["stats"]["defence"] + knight["weaponry"]["horse"]
-    attack_total = knight["stats"]["attack"] + knight["weaponry"]["horse"]
-    health_total = knight["stats"]["health"] + knight["weaponry"]["horse"]
+    sword = knight["weaponry"]["sword"]
+    horse = knight["weaponry"]["horse"]
+    armour = knight["weaponry"]["armour"]
+    shield = knight["weaponry"]["shield"]
+    
+    defence_total = int(knight["stats"]["defence"] + knight["weaponry"]["horse"]["value"])
+    attack_total = int(knight["stats"]["attack"] + knight["weaponry"]["sword"]["value"])
+    return {"attack": attack_total, "defence": defence_total}
