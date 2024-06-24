@@ -1,3 +1,3 @@
 from .combat import *
 from .level import *
-from data import items_attack, items_defence, items_horse, items
+from data import items_sword, items_armour, items_shield, items_horse, items
