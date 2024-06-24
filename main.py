@@ -1,34 +1,42 @@
 import random
 import time
 from logic import *
-# Call to create a new knight
-
-# items_attack = [{"name": "default", "value": int(10), "price": int(10)},
-#                 {"name": "bronze", "value": int(20), "price": int(20)},
-#                 {"name": "steel", "value": int(30), "price": int(80)},
-#                 {"name": "obsedian", "value": int(50), "price": int(100)}]
-# items_defence = items_attack
-# items_horse = [{"name": "default", "value": int(50), "price": int(10)},
-#                 {"name": "medium", "value": int(20), "price": int(50)},
-#                 {"name": "large", "value": int(40), "price": int(100)},
-#                 {"name": "supreme", "value": int(60), "price": int(200)}]
-# items = [items_attack, items_defence, items_horse]
 
 def display_info(knight):
-    print("Current stats for " + knight["name"] + ": " "\n")
     print()
+    print("Current stats for " + knight["name"] + ": " "\n")
     for x, y in knight["stats"].items(): 
         print(str(x) + ": " + str(y))
     print()
-    print("Current Weaponry: \n")
+    print("Current Combat Gear: \n")
     for x, y in knight["weaponry"].items(): 
-        print(str(x) + ": x " + str(y))
+        print(str(x) + ": " + str(y))
+    print()
     print("Current inventory: \n")
     for x, y in knight["inventory"].items(): 
-        print(str(x) + ": x " + str(y))
+        print(str(x) + ": " + str(y))
     print()
     
+def display_shop(items, knight):
+    item_dict = {"attack": items[0], "defence": items[1], "horse": items[2]}
+    flatten_list = []
+    for category, list in item_dict.items():
+        print(str(category) + " - items: \n")
+        for item in list:
+            flatten_list.append(item)
+            print("id: " + str(item["id"]) + ", type: " + item["name"] + ", value: " + str(item["value"]) + ", price: " + str(item["price"]))
+    selection = int(input("Which item do you want to buy?"))
+    
+    try:
+        item = flatten_list[selection] 
 
+    # Psudeo code
+    # 1. Flatten items so can select by id
+    # 2. make sure item id exist in list with try except KeyError
+    # 3. if item exists and we have enough money override property and subtract balance
+    # 4 if item exist and we dont hae enough money re run display shop
+    # 5. allow input of knight so we can assign item to knight
+    
 def create_knight(knights):  
     #Create a new dictionary to hold knights data
     knights_data = {}
@@ -50,35 +58,31 @@ def create_knight(knights):
     knights.append(knights_data)
 
     print("Creating your knight...")
-    time.sleep(1)
+    # time.sleep(1)
     print("Training your Knight...")
-    time.sleep(3)
+    # time.sleep(3)
     print("Knight is made!")
     print("Here's their stats:")
     display_info(knights_data)
+    menu(knights_number)
 
 # Call a knight and change their properties
 def change_data(knights):
     print("--- What would you like to update? ---")
-    print("1: Knight's name: " + knights[0])
+    print("0: Back To Knight Selection")
+    print("1: Knight's name: " + knights["name"])
     # ADD MORE STUFF TO CHANGE HERE.
     # Catches any inputs that aren't a number.
-    try:
+    selection = int(input("Select your option: "))
 
-        selection = int(input("Select your option: "))
-
-        if selection == 1:
-            if knights_number == 0:
-                print("You have a knight!")
-            knights[0] = str(input("What is their new name? "))
-            print("Your knight's new name is: " + knights[0])
-            return 
-        else:
-            print("--- Please select a valid option ---")
+    if selection == 1:
+        knights["name"] = str(input("What is their new name? "))
+        print("Your knight's new name is: " + knights["name"])
+    elif selection == 0:
+        select_knight(knights)
+    else:
+        print("--- Please select a valid option ---")
             
-    except:
-        print("--- Try Again! ---")
-        change_data(knights)
 
 # Show current knights and select one
 
@@ -87,11 +91,17 @@ def select_knight(knights):
     # Reset the list to print all the knights
     knights_number = 0
     print("What knight do you want to update? \n")
-    while knights_number < int(len(knights)):
-        print(str(knights_number + 1) + "- Knight's name: " + str(knights[knights_number][0]))
-        knights_number += 1
-    select = (int(input("\nSelect the Knights number: ")) -1)
-    change_data(knights[select])
+    try:
+        print("0- Back To Menu")
+        while knights_number < int(len(knights)):
+            print(str(knights_number + 1) + "- Knight's name: " + str(knights[knights_number]["name"]))
+            knights_number += 1
+        select = (int(input("\nSelect the Knights number: ")) -1)
+        if select >= 0:
+            change_data(knights[select])
+    except:
+        print("Please select a valid option")
+        select_knight(knights)
     
 # Menu options to choose selection
 def menu(knights_number):
@@ -128,6 +138,23 @@ def menu(knights_number):
             else:
                 select_knight(knights)
                 menu(knights_number)
+                
+        elif select == 3:
+            if int(len(knights)) == 0:
+                print("You need to create a knight first! \n")
+                menu(knights_number)
+            else:
+                display_info(knights)
+                menu(knights_number)
+        
+        elif select == 4:
+            if int(len(knights)) == 0:
+                print("You need to create a knight first! \n")
+                menu(knights_number)
+            else:
+                display_shop(items)
+                menu(knights_number)
+                
             
         elif select == 0:
             print("--- All your knights!---\n")
@@ -148,8 +175,10 @@ def menu(knights_number):
             menu(knights_number)
     
     #  If input isn't an integer
-    except:
+    except Exception as e:
         print("--- Try Again! ---\n")
+        print(f"An error occurred: {e}")
+        print(f"Type of error: {type(e).__name__}")
         menu(knights_number)
 
 # Setting the scene
