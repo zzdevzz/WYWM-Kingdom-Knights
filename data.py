@@ -7,6 +7,8 @@ items_shield = []
 items_armour = []
 length = len(items_sword)
 
+# Will create items for other categories but assign correct id based on list length.
+
 for item in items_sword:
     shield_item = {**item}
     armour_item = {**item}

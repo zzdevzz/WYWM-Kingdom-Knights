@@ -1,41 +1,48 @@
 import random
 import time
-from random import randrange
-# def find_item_by_id(id,items):
-#     inventory = flatten_list = []
-#     for category in items:
-#         for item in category:
-#             flatten_list.append(item)
-#     for item in inventory:
-#         if item["item"] == id:
-#             return item
-#     return None  # Return None if no item with the given ID is found
+from .level import *
+
+def rest():
+    print("You need to rest to recover your health...")
+    time.sleep(2)
+    print("resting...")
+    time.sleep(2)
+    print("resting more...")
+    time.sleep(2)
+    print("All rested! Your health has now fully recovered.")
+    print()
+    print(r"""       
+      __      _
+     /__\__  //
+    //_____\///
+   _| /-_-\)|/_
+  (___\ _ //___\
+  (  |\\_/// * \\
+   \_| \_((*   *))
+   ( |__|_\\  *//
+   (o/  _  \_*_/
+   //\__|__/\
+  // |  | |  |
+ //  _\ | |___)
+//  (___|
+          """)
+    print()
     
-def heal(knight):
-    heal_amount = int(15)
-    current_health = knight["stats"]["current_health"]
-    max_health = knight["stats"]["max_health"]
-    if current_health == max_health:
-        print("Already at max health!")
-    elif knight["inventory"]["bandages"] == 0:
-        print("You have no bandages left!")
-    else:
-        current_bandages = knight["inventory"]["bandages"]
-        current_bandages -= 1
-        current_health += heal_amount
-        current_health = current_health if current_health < max_health else max_health
-        print("Knight healed")
-        print("Health: " + str(current_health) + " - You have " + str(current_bandages) + " bandages left.")
+# Checks if either knight is dead and assigns correct XP to player knight.
 
 def is_dead(knight, knight_health, opp_health):
     if knight_health <= 0:
-        print("Oh no! " + str(knight["name"]) + " is dead!!!")
+        knight["stats"]["xp"] -= int(10) if knight["stats"]["xp"] > 10 else int(10)
+        knight["stats"]["level"] = calculate_level(knight["stats"]["xp"]) 
+        raise Exception("KnightLost")
     elif opp_health <= 0:
-        print("Congratulations! You have won! The Kingdom thanks you!")
-        print("You have been granted 10 xp!")
-        knight["stats"]["xp"] += int(10) 
+        knight["stats"]["xp"] += int(10)
+        knight["inventory"]["gold"] += int(50)
+        knight["stats"]["level"] = calculate_level(knight["stats"]["xp"]) 
+        raise Exception("KnightWon")
     else:
         return
+# Calculates battle stats for knight based on player stats and gear stats.
 
 def battle_stats(knight):
     sword = knight["weaponry"]["sword"]["value"]
@@ -48,59 +55,87 @@ def battle_stats(knight):
     health_total = int(knight["stats"]["health"]) + horse
     return {"attack": attack_total, "defence": defence_total, "health": health_total}
 
+# Generates an opponent identical to player stats with different name.
 def generate_opponent(stats):
     names = ["Tristan", "Tywin", "Goraf", "Luther"]
     opponent = {**stats}
     opponent["name"] = random.choice(names)
     return opponent
-        
+
+# Determines if attack is successful and damage amount based on both knights stats        
 def damage_dealt(stats_1, stats_2):
     attack_1 = stats_1["attack"]
-    max_hit_1 = round(attack_1 / 1)
+    max_hit_1 = attack_1
     
     defence_2 = stats_2["defence"]
     
     successful_attack = random.randint(round(attack_1/4),attack_1) > random.randint(round(defence_2/4), defence_2)
-    damage = round(random.random(0.3, 1.0) * max_hit_1)
+    damage = round(random.uniform(0.3, 1.0) * max_hit_1)
     if successful_attack:
         return damage
     else:
-        return 0
+        return 5
         
     
 def battle(knight):
     print("Commencing Battle!")
+    print(r"""
+         *_   _   _   _   _   _ *
+ ^       | `_' `-' `_' `-' `_' `|       ^
+ |       |                      |       |
+ |  (*)  |_   _   _   _   _   _ |  \^/  |
+ | _<">_ | `_' `-' `_' `-' `_' `| _(#)_ |
+o+o \ / \0                      0/ \ / (=)
+ 0'\ ^ /\/                      \/\ ^ /`0
+   /_^_\ |                      | /_^_\
+   || || |                      | || ||
+   d|_|b_T______________________T_d|_|b
+          """)
+    time.sleep(2)
     print()
     knight_stats = battle_stats(knight)
-    # print("Knight stats " + str(knight_stats))
     opp_stats = generate_opponent(knight_stats)
-    # print("Opponent stats " + str(opp_stats))
     knight_health = knight_stats["health"]
     opp_health = opp_stats["health"]
     
-    while knight_health > 0 and opp_health > 0:
-        
-        # Knight attacks opponent
-        damage = damage_dealt(knight_stats, opp_stats)
-        opp_health -= damage
-        opp_health =  opp_health if opp_health >= 0 else 0
+    # Allows us to break out loop while loop if fight stops before code reaches end.
+    try:
+        while knight_health > 0 and opp_health > 0:
+            
+            # Knight attacks opponent
+            damage = damage_dealt(knight_stats, opp_stats)
+            opp_health -= damage
+            opp_health =  opp_health if opp_health >= 0 else 0
 
-        print("Knight " + knight["name"] + " caused " + str(damage) + " damage to " + opp_stats["name"] + ".")
-        print("Knight " + opp_stats["name"] + " has " + str(opp_health) + " health remaining.") 
-        print()
-        is_dead(knight, knight_health, opp_health)
+            print("=||======>")
+            print("Knight " + knight["name"] + " caused " + str(damage) + " damage to " + opp_stats["name"] + ".")
+            print("Knight " + opp_stats["name"] + " has " + str(opp_health) + " health remaining.") 
+            print()
+            is_dead(knight, knight_health, opp_health)
 
-        time.sleep(0.5)
-        
-        # Opponent attacks knight
-        damage = damage_dealt(knight_stats, opp_stats)
-        knight_health -= damage
-        knight_health =  knight_health if knight_health >= 0 else 0
+            time.sleep(0.5)
+            
+            # Opponent attacks knight
+            damage = damage_dealt(knight_stats, opp_stats)
+            knight_health -= damage
+            knight_health =  knight_health if knight_health >= 0 else 0
 
-        print("Sir " + opp_stats["name"] + " caused " + str(damage) + " damage to " + knight["name"] + ".")
-        print(knight["name"] + " has " + str(knight_health) + " health remaining.") 
-        print()
-        is_dead(knight, knight_health, opp_health)
-        time.sleep(0.5)
-        
-        
+            print("<======||=")
+            print("Sir " + opp_stats["name"] + " caused " + str(damage) + " damage to " + knight["name"] + ".")
+            print(knight["name"] + " has " + str(knight_health) + " health remaining.") 
+            print()
+            is_dead(knight, knight_health, opp_health)
+            time.sleep(0.5)
+            
+    # Prints result depending on outcome.        
+    except Exception as e:
+        if str(e) == "KnightLost":
+            print("Oh no! " + str(knight["name"]) + " lost!")
+            print()
+            rest()
+        elif str(e) == "KnightWon":
+            print("Congratulations! You have won! The Kingdom thanks you!")
+            print("You have been granted 10 xp and won 50 gold!")
+            print()
+            rest()
+            

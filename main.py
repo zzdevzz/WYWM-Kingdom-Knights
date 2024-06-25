@@ -5,6 +5,21 @@ from logic import *
 def display_info(knight):
     print()
     print("Current base stats for " + knight["name"] + ": " "\n")
+    print(r"""       
+      __      _
+     /__\__  //
+    //_____\///
+   _| /-_-\)|/_
+  (___\ _ //___\
+  (  |\\_/// * \\
+   \_| \_((*   *))
+   ( |__|_\\  *//
+   (o/  _  \_*_/
+   //\__|__/\
+  // |  | |  |
+ //  _\ | |___)
+//  (___|
+          """)
     print("====================")
     for x, y in knight["stats"].items(): 
         print(str(x) + ": " + str(y))
@@ -28,7 +43,7 @@ def display_shop(items, knight):
         print(str(category[0]["category"]) + "s :")
         for item in category:
             flatten_list.append(item)
-            print(str(item["id"]) + "- type: " + item["name"] + ", value: " + str(item["value"]) + ", price: " + str(item["price"]))
+            print(str(item["id"]) + " - type: " + item["name"] + ", value: " + str(item["value"]) + ", price: " + str(item["price"]))
         print()
     try:
         print("Your current balance is: " + str(knight["inventory"]["gold"]))
@@ -53,12 +68,6 @@ def display_shop(items, knight):
         print(f"Type of error: {type(e).__name__}")
         display_shop(items, knight)
         
-    # Psudeo code
-    # 1. Flatten items so can select by id ✅
-    # 2. make sure item id exist in list with try except KeyError ✅
-    # 3. if item exists and we have enough money override property and subtract balance
-    # 4 if item exist and we dont hae enough money re run display shop
-    # 5. allow input of knight so we can assign item to knight
     
 def create_knight(knights):  
     #Create a new dictionary to hold knights data
@@ -66,17 +75,19 @@ def create_knight(knights):
     
     print("Lets create a knight!")
     
+    name = ""
+    while name == "":
+        name = str(input("What is the knights name? Sir: "))
     # Set the information up for the knight
-    knights_data["name"] = ("Sir " + str(input("What is the knights name: ")))
+    knights_data["name"] = ("Sir " + name)
     print()
     knights_data["stats"] = {"level": int(1), 
                              "xp": int(10), 
                              "health": int(100),
-                            #  "current_health": int(70), 
                              "attack": int(10), 
                              "defence": int(10)}
     knights_data["weaponry"] = {"horse": items_horse[0], "sword": items_sword[0], "shield": items_shield[0], "armour": items_armour[0]}
-    knights_data["inventory"] = {"bandages" : int(5), "throwing_knife": int(5), "gold": int(100)}
+    knights_data["inventory"] = {"gold": int(100)}
     
     # Adds all the knight info to knights array
     knights.append(knights_data)
@@ -91,25 +102,27 @@ def create_knight(knights):
     display_info(knights_data)
     menu(knights_number)
 
+
 # Call a knight and change their properties
-def change_data(knights):
+def change_data(knight):
+    print()
     print("--- What would you like to update? ---")
     print("0: Back To Knight Selection")
-    print("1: Knight's name: " + knights["name"])
+    print("1: Knight's name: " + knight["name"])
     # ADD MORE STUFF TO CHANGE HERE.
     # Catches any inputs that aren't a number.
     selection = int(input("Select your option: "))
 
     if selection == 1:
-        knights["name"] = str(input("What is their new name? "))
-        print("Your knight's new name is: " + knights["name"])
+        knight["name"] = str("sir " + input("What is their new name? Sir: "))
+        print("Your knight's new name is sir: " + knight["name"])
     elif selection == 0:
         select_knight(knights)
     else:
         print("--- Please select a valid option ---")
-            
-
-# Show current knights and select one
+        
+        
+# Show all knights and select one
 
 def select_knight(knights):
     
@@ -124,6 +137,9 @@ def select_knight(knights):
         select = (int(input("\nSelect the Knights number: ")) -1)
         if select >= 0:
             return (knights[select])
+        else:
+            menu(knights_number)
+            print("this was run after menu")
     except:
         print("Please select a valid option")
         select_knight(knights)
@@ -131,20 +147,22 @@ def select_knight(knights):
 # Menu options to choose selection
 def menu(knights_number):
     # Display options printed to console
+    print()
     print("What do you want to do?")
     print()
     print("1: Create a new knight")
     print("2: Update your knight")
-    print("3: Display a current knight stats")
+    print("3: View knight stats")
     print("4: Visit shop to upgrade Knight")
     print("5: Battle opponents")
-    print("6: View All Knights")
+    print("6: View all knights")
     print("0: Exit")
     
     # Allows a selection and verify input is keyboard number
     
     try: 
         #  Take user input
+        print()
         select = int(input("Select Option: "))
         print()
         
@@ -154,7 +172,7 @@ def menu(knights_number):
             
             # Print out the knight that was made
             print("\n--- Your Knight --- \n")
-            print("Knight's name: " + str(knights[knights_number][0] + "\n"))
+            print("Knight's name: " + str(knights[knights_number]["name"] + "\n"))
             knights_number += 1
             menu(knights_number)
         
@@ -190,20 +208,24 @@ def menu(knights_number):
             else:
                 knight = select_knight(knights)
                 battle(knight)
-        elif select == 0:
+                menu(knights_number)
+        elif select == 6:
             print("--- All your knights!---\n")
             
             #  Reset the knights_number, so we can count and iterate all the knights
             knights_number = 0
             
             while knights_number < int(len(knights)):
-                print(str(knights_number + 1) + "- Knight's name: " + str(knights[knights_number][0]))
+                print(str(knights_number + 1) + "- Knight's name: " + str(knights[knights_number]["name"]))
                 knights_number += 1
             
             if int(len(knights)) == 0:
                 print("Wait... You have no knights! Have a number: " + str(random.randint(0, 100)))
-            
-        # For DEV - Check what happens if you remove this. Why do we need to catch int twice?
+            menu(knights_number)
+        elif select == 0:
+            print("Goodbye")
+            print()
+            return
         else:
             print("--- Try Again! ---\n")
             menu(knights_number)
