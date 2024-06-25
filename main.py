@@ -4,35 +4,58 @@ from logic import *
 
 def display_info(knight):
     print()
-    print("Current stats for " + knight["name"] + ": " "\n")
+    print("Current base stats for " + knight["name"] + ": " "\n")
+    print("====================")
     for x, y in knight["stats"].items(): 
         print(str(x) + ": " + str(y))
     print()
     print("Current Combat Gear: \n")
     for x, y in knight["weaponry"].items(): 
-        print(str(x) + ": " + str(y))
+        print(str(x) + ": " + str(y["name"]))
     print()
     print("Current inventory: \n")
     for x, y in knight["inventory"].items(): 
         print(str(x) + ": " + str(y))
+    print("====================")
     print()
     
 def display_shop(items, knight):
-    item_dict = {"attack": items[0], "defence": items[1], "horse": items[2]}
+    # item_dict = {"sword": items[0], "shield": items[1], "armour": items[2], "horse": items[3]}
     flatten_list = []
-    for category, list in item_dict.items():
-        print(str(category) + " - items: \n")
-        for item in list:
+    # for category, list in item_dict.items():
+    print()
+    for category in items:
+        print(str(category[0]["category"]) + "s :")
+        for item in category:
             flatten_list.append(item)
-            print("id: " + str(item["id"]) + ", type: " + item["name"] + ", value: " + str(item["value"]) + ", price: " + str(item["price"]))
-    selection = int(input("Which item do you want to buy?"))
-    
+            print(str(item["id"]) + "- type: " + item["name"] + ", value: " + str(item["value"]) + ", price: " + str(item["price"]))
+        print()
     try:
-        item = flatten_list[selection] 
-
+        print("Your current balance is: " + str(knight["inventory"]["gold"]))
+        selection = int(input("Which item do you want to buy? ")) - 1
+        print()
+        item = flatten_list[selection]
+        print("You have selected: " + str(item["name"]) + " " + str(item["category"]))
+        if knight["inventory"]["gold"] < item["price"]:
+            print("You do not have enough gold to purchase this item! Go Battle more!")
+        else:
+            weaponry = knight["weaponry"]
+            weaponry[item["category"]] = item
+            knight["inventory"]["gold"] -= item["price"]
+            print("You have bought: " + str(item["name"]) + " " + str(item["category"] + " for " + str(item["price"]) + " gold."))
+            print("You have now have " + str(knight["inventory"]["gold"]) + " gold left.")
+            print("Your knight inspects his new item and equips it!")
+            print()
+    
+    except Exception as e:
+        print("You need to select a valid item.")
+        print(f"An error occurred: {e}")
+        print(f"Type of error: {type(e).__name__}")
+        display_shop(items, knight)
+        
     # Psudeo code
-    # 1. Flatten items so can select by id
-    # 2. make sure item id exist in list with try except KeyError
+    # 1. Flatten items so can select by id ✅
+    # 2. make sure item id exist in list with try except KeyError ✅
     # 3. if item exists and we have enough money override property and subtract balance
     # 4 if item exist and we dont hae enough money re run display shop
     # 5. allow input of knight so we can assign item to knight
@@ -45,24 +68,26 @@ def create_knight(knights):
     
     # Set the information up for the knight
     knights_data["name"] = ("Sir " + str(input("What is the knights name: ")))
+    print()
     knights_data["stats"] = {"level": int(1), 
                              "xp": int(10), 
-                             "max_health": int(100),
-                             "current_health": int(70), 
+                             "health": int(100),
+                            #  "current_health": int(70), 
                              "attack": int(10), 
                              "defence": int(10)}
-    knights_data["weaponry"] = {"horse": "default", "sword": "default", "shield": "default", "armour": "default"}
+    knights_data["weaponry"] = {"horse": items_horse[0], "sword": items_sword[0], "shield": items_shield[0], "armour": items_armour[0]}
     knights_data["inventory"] = {"bandages" : int(5), "throwing_knife": int(5), "gold": int(100)}
     
     # Adds all the knight info to knights array
     knights.append(knights_data)
+    
+    # Displays Knight being made with their stats.
 
     print("Creating your knight...")
     # time.sleep(1)
     print("Training your Knight...")
     # time.sleep(3)
     print("Knight is made!")
-    print("Here's their stats:")
     display_info(knights_data)
     menu(knights_number)
 
@@ -90,7 +115,7 @@ def select_knight(knights):
     
     # Reset the list to print all the knights
     knights_number = 0
-    print("What knight do you want to update? \n")
+    print("What knight do you want to choose? \n")
     try:
         print("0- Back To Menu")
         while knights_number < int(len(knights)):
@@ -98,7 +123,7 @@ def select_knight(knights):
             knights_number += 1
         select = (int(input("\nSelect the Knights number: ")) -1)
         if select >= 0:
-            change_data(knights[select])
+            return (knights[select])
     except:
         print("Please select a valid option")
         select_knight(knights)
@@ -111,7 +136,9 @@ def menu(knights_number):
     print("1: Create a new knight")
     print("2: Update your knight")
     print("3: Display a current knight stats")
-    print("4: Visit shop")
+    print("4: Visit shop to upgrade Knight")
+    print("5: Battle opponents")
+    print("6: View All Knights")
     print("0: Exit")
     
     # Allows a selection and verify input is keyboard number
@@ -136,7 +163,8 @@ def menu(knights_number):
                 print("You need to create a knight first! \n")
                 menu(knights_number)
             else:
-                select_knight(knights)
+                knight = select_knight(knights)
+                change_data(knight)
                 menu(knights_number)
                 
         elif select == 3:
@@ -144,7 +172,7 @@ def menu(knights_number):
                 print("You need to create a knight first! \n")
                 menu(knights_number)
             else:
-                display_info(knights)
+                display_info(select_knight(knights))
                 menu(knights_number)
         
         elif select == 4:
@@ -152,10 +180,16 @@ def menu(knights_number):
                 print("You need to create a knight first! \n")
                 menu(knights_number)
             else:
-                display_shop(items)
+                display_shop(items, select_knight(knights))
                 menu(knights_number)
                 
-            
+        elif select == 5:
+            if int(len(knights)) == 0:
+                print("You need to create a knight first! \n")
+                menu(knights_number)
+            else:
+                knight = select_knight(knights)
+                battle(knight)
         elif select == 0:
             print("--- All your knights!---\n")
             
@@ -187,8 +221,27 @@ knights_number = 0
 knights = []
 
 # Run the program
-print("Welcome to our Kingdom!")
+print(r"""
+Welcome to our Kingdom!
+
+
+
+                   T~~
+               |
+              /"\
+      T~~     |'| T~~
+  T~~ |    T~ WWWW|
+  |  /"\   |  |  |/\T~~
+ /"\ WWW  /"\ |' |WW|
+WWWWW/\| /   \|'/\|/"\
+|   /__\/]WWW[\/__\WWWW
+|"  WWWW'|I_I|'WWWW'  |
+|   |' |/  -  \|' |'  |
+|'  |  |LI=H=LI|' |   |
+|   |' | |[_]| |  |'  |
+|   |  |_|###|_|  |   |
+'---'--'-/___\-'--'---' 
+      """)
+# time.sleep(3)
 print("You need to create Knights to defend the Kingdom with.")
-# menu(knights_number)
 create_knight(knights)
-print(combat.heal(knights[0]))
