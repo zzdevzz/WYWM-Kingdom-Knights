@@ -3,6 +3,8 @@ import time
 from .level import *
 
 def rest():
+    
+    """Generates rest text to console"""
     print("You need to rest to recover your health...")
     time.sleep(2)
     print("resting...")
@@ -28,9 +30,15 @@ def rest():
           """)
     print()
     
-# Checks if either knight is dead and assigns correct XP to player knight.
 
 def is_dead(knight, knight_health, opp_health):
+    
+    """Checks if either knight is dead.
+    
+    Assigns correct xp and gold amount if player has one,
+    handles error to shows who won.
+    """
+    
     if knight_health <= 0:
         knight["stats"]["xp"] -= int(10) if knight["stats"]["xp"] > 10 else int(10)
         knight["stats"]["level"] = calculate_level(knight["stats"]["xp"]) 
@@ -42,9 +50,11 @@ def is_dead(knight, knight_health, opp_health):
         raise Exception("KnightWon")
     else:
         return
-# Calculates battle stats for knight based on player stats and gear stats.
+
 
 def battle_stats(knight):
+    
+    """Calculates battle stats for knight based on player stats and gear stats."""
     sword = knight["weaponry"]["sword"]["value"]
     horse = knight["weaponry"]["horse"]["value"]
     armour = knight["weaponry"]["armour"]["value"]
@@ -55,15 +65,19 @@ def battle_stats(knight):
     health_total = int(knight["stats"]["health"]) + horse
     return {"attack": attack_total, "defence": defence_total, "health": health_total}
 
-# Generates an opponent identical to player stats with different name.
+
 def generate_opponent(stats):
+    
+    """Generates an opponent identical to player stats with different name."""
     names = ["Tristan", "Tywin", "Goraf", "Luther"]
     opponent = {**stats}
     opponent["name"] = random.choice(names)
     return opponent
 
-# Determines if attack is successful and damage amount based on both knights stats        
+      
 def damage_dealt(stats_1, stats_2):
+    
+    """Determines if attack is successful and damage amount based on both knights stats."""
     attack_1 = stats_1["attack"]
     max_hit_1 = attack_1
     
@@ -78,6 +92,12 @@ def damage_dealt(stats_1, stats_2):
         
     
 def battle(knight):
+    
+    """Produces a battle based on given knight.
+    
+    Will use damage_dealt, battle_stats, generate_opponent and is_dead functions to help,
+    fully rng based so battles lengths can vary."""
+    
     print("Commencing Battle!")
     print(r"""
          *_   _   _   _   _   _ *
